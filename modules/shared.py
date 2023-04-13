@@ -17,7 +17,16 @@ from modules import localization, script_loading, errors, ui_components, shared_
 from modules.paths_internal import models_path, script_path, data_path, sd_configs_path, sd_default_config, sd_model_file, default_sd_model_file, extensions_dir, extensions_builtin_dir
 
 demo = None
-
+chatgpt_api = "http://172.16.85.234:7861/chatbotapi/v1/chat/"
+sd_model_parameter_template = {
+    "写实": {
+                "negative_prompt": "(semi-realistic, cgi, 3d, render, sketch, cartoon, drawing, anime:1.4), text, close up, cropped, out of frame, worst quality, low quality, jpeg artifacts, ugly, duplicate, morbid, mutilated, extra fingers, mutated hands, poorly drawn hands, poorly drawn face, mutation, deformed, blurry, dehydrated, bad anatomy, bad proportions, extra limbs, cloned face, disfigured, gross proportions, malformed limbs, missing arms, missing legs, extra arms, extra legs, fused fingers, too many fingers, long neck",
+                "seed": -1,
+                "sampler_name": "DPM++ 2S a Karras",
+                "steps": 20,
+                "cfg_scale": 7,
+            }
+}
 parser = cmd_args.parser
 
 script_loading.preload_extensions(extensions_dir, parser)

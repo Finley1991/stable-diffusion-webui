@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field, create_model
 from typing import Any, Optional
 from typing_extensions import Literal
 from inflection import underscore
-from modules.processing import StableDiffusionProcessingTxt2Img, StableDiffusionProcessingImg2Img
+from modules.processing import StableDiffusionProcessingTxt2Img, StableDiffusionProcessingImg2Img, StableDiffusionProcessingChatTxt2Img
 from modules.shared import sd_upscalers, opts, parser
 from typing import Dict, List
 
@@ -75,6 +75,7 @@ class PydanticModelGenerator:
             )
             for (k,v) in self._class_data.items() if k not in API_NOT_ALLOWED
         ]
+        # print("#######################", self._model_def)
 
         for fields in additional_fields:
             self._model_def.append(ModelDef(
@@ -83,6 +84,7 @@ class PydanticModelGenerator:
                 field_type=fields["type"],
                 field_value=fields["default"],
                 field_exclude=fields["exclude"] if "exclude" in fields else False))
+        # print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!", self._model_def)
 
     def generate_model(self):
         """
@@ -92,7 +94,9 @@ class PydanticModelGenerator:
         fields = {
             d.field: (d.field_type, Field(default=d.field_value, alias=d.field_alias, exclude=d.field_exclude)) for d in self._model_def
         }
+        # print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@", self._model_name)
         DynamicModel = create_model(self._model_name, **fields)
+        # print("*****************************", DynamicModel)
         DynamicModel.__config__.allow_population_by_field_name = True
         DynamicModel.__config__.allow_mutation = True
         return DynamicModel
@@ -107,6 +111,21 @@ StableDiffusionTxt2ImgProcessingAPI = PydanticModelGenerator(
         {"key": "send_images", "type": bool, "default": True},
         {"key": "save_images", "type": bool, "default": False},
         {"key": "alwayson_scripts", "type": dict, "default": {}},
+    ]
+).generate_model()
+
+
+StableDiffusionChatTxt2ImgProcessingAPI = PydanticModelGenerator(
+    "StableDiffusionProcessingChatTxt2Img",
+    StableDiffusionProcessingChatTxt2Img,
+    [
+        {"key": "sampler_index", "type": str, "default": "Euler"},
+        {"key": "script_name", "type": str, "default": None},
+        {"key": "script_args", "type": list, "default": []},
+        {"key": "send_images", "type": bool, "default": True},
+        {"key": "save_images", "type": bool, "default": False},
+        {"key": "alwayson_scripts", "type": dict, "default": {}},
+        # {"key":"user_select_type", "type": str, "default": "写实"},
     ]
 ).generate_model()
 
